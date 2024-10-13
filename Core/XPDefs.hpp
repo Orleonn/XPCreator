@@ -31,3 +31,8 @@ inline std::wstring XPGetBinaryDir()
 	*wcsrchr(path, L'\\') = L'\0';
 	return { path };
 }
+
+inline void XPShowErrorBox(const wxString& message)
+{
+	wxMessageBox(message, L"Error", wxOK | wxICON_ERROR | wxCENTRE);
+}

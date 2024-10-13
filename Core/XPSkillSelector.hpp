@@ -4,7 +4,7 @@
 
 #define XP_SKILL_PROPS_BAR_WIDTH 300
 #define XP_SKILL_PROPS_BAR_HEIGHT 200
-#define XP_SKILL_PROPS_CAP L"Skill properties"
+#define XP_SKILL_PROPS_CAP L"Selected properties:"
 
 class XPSkillPropsBar : public wxChoice
 {
@@ -45,10 +45,11 @@ public:
 		mXPSelectedList->Bind(wxEVT_LISTBOX, &XPSkillPropsBar::XPOnSelectRightItem, this);
 
 		mXPPropsCap = new wxStaticText(parent, wxID_ANY,
-			XP_SKILL_PROPS_CAP, { pos.x, pos.y - 40 },
+			wxEmptyString, { pos.x, pos.y - 40 },
 			{ mXPSelectedList->GetPosition().x + mXPSelectedList->GetSize().x - pos.x, 40 },
 			wxALIGN_CENTRE_HORIZONTAL);
 		mXPPropsCap->SetFont(mXPPropsCap->GetFont().Scale(1.75F));
+		this->XPUpdateCaptionName();
 	}
 
 	virtual bool ProcessEvent(wxEvent& event) override
@@ -83,15 +84,14 @@ private:
 	void XPUpdateCaptionName()
 	{
 		const unsigned int count = mXPSelectedList->GetCount();
-		if (count == 0)
-			mXPPropsCap->SetLabelText(XP_SKILL_PROPS_CAP);
-		else
-			mXPPropsCap->SetLabelText(XPSprintf(L"%s x%u", XP_SKILL_PROPS_CAP, count));
+		mXPPropsCap->SetLabelText(XPSprintf(L"%s x%u", XP_SKILL_PROPS_CAP, count));
 	}
 
 	void XPOnSelectLeftItem()
 	{
 		mXPBtnAdd->Enable(this->GetCurrentSelection() != wxNOT_FOUND);
+		mXPBtnRemove->Enable(false);
+		mXPSelectedList->SetSelection(wxNOT_FOUND);
 	}
 
 	void XPOnSelectRightItem(wxCommandEvent& event)
@@ -126,17 +126,23 @@ private:
 		mXPSelectedList->GetSelections(arr);
 		if (arr.empty()) return;
 		
+		int id;
 		wxString item;
-		for (const auto& id : arr)
+		do
 		{
+			id = arr.back();
 			item = mXPSelectedList->GetString(id);
+			arr.pop_back();
+
 			this->AppendString(item);
 			mXPSelectedList->Delete(id);
+
 			if (mXPCallbackRemove.first && mXPCallbackRemove.second)
 			{
 				(mXPCallbackRemove.first->*mXPCallbackRemove.second)(item);
 			}
-		}
+		} while (!arr.empty());
+
 		XPUpdateCaptionName();
 	}
 

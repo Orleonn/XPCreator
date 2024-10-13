@@ -14,11 +14,16 @@
     <ClInclude Include="XPTextBar.hpp" />
     <ClInclude Include="XPSkillSelector.hpp" />
     <ClInclude Include="XPSkillIcon.hpp" />
+    <ClInclude Include="XPPropsContent.hpp" />
+    <ClInclude Include="XPCreator.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XPMainWindow.cpp" />
     <ClCompile Include="XPApp.cpp" />
     <ClCompile Include="XPSkillIcon.cpp" />
+    <ClCompile Include="XPPropsContent.cpp" />
+    <ClCompile Include="Props\JumpPower.cpp" />
+    <ClCompile Include="XPCreator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Core.rc">

@@ -5,7 +5,7 @@
 
 
 
-class XPApplication : public wxApp
+class XPApplication final : public wxApp
 {
 public:
 	virtual bool OnInit();

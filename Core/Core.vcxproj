@@ -62,7 +62,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -84,7 +84,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,12 +100,17 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Props\JumpPower.cpp" />
     <ClCompile Include="XPApp.cpp" />
+    <ClCompile Include="XPCreator.cpp" />
     <ClCompile Include="XPSkillIcon.cpp" />
+    <ClCompile Include="XPPropsContent.cpp" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="XPCreator.hpp" />
     <ClInclude Include="XPDefs.hpp" />
     <ClInclude Include="XPMainWindow.hpp" />
     <ClInclude Include="XPSkillIcon.hpp" />
+    <ClInclude Include="XPPropsContent.hpp" />
     <ClInclude Include="XPSkillSelector.hpp" />
     <ClInclude Include="XPTextBar.hpp" />
     <ClInclude Include="XPTrackBar.hpp" />

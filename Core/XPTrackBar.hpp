@@ -16,7 +16,6 @@ public:
         long style = wxSL_HORIZONTAL)
         : wxSlider(parent, id, value, minValue, maxValue, pos, size, style)
     {
-        wxSlider::Bind(wxEVT_SLIDER, &XPTrackBar::OnSliderChanged, this);
         const wxRect rc = wxSlider::GetRect();
         m_MSliderCounter = new wxStaticText(parent, wxID_ANY, std::to_wstring(value),
             { rc.x + rc.width + 5, rc.y}, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
@@ -27,6 +26,12 @@ public:
         m_MSliderName->SetFont(m_MSliderName->GetFont().Scale(1.3F));
     }
 
+    virtual ~XPTrackBar()
+    {
+        m_MSliderCounter->Destroy();
+        m_MSliderName->Destroy();
+    }
+
     void SetToolTip(const wxString& tip)
     {
         m_MSliderName->SetToolTip(tip);
@@ -35,6 +40,15 @@ public:
     void UnsetToolTip()
     {
         m_MSliderName->UnsetToolTip();
+    }
+
+    virtual bool ProcessEvent(wxEvent& event) override
+    {
+        if (event.GetId() == this->GetId() && event.GetEventType() == wxEVT_SLIDER)
+        {
+            this->OnSliderChanged(static_cast<wxCommandEvent&>(event));
+        }
+        return wxSlider::ProcessEvent(event);
     }
 
 private:

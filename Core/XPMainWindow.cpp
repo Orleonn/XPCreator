@@ -3,6 +3,8 @@
 #include "XPTextBar.hpp"
 #include "XPSkillSelector.hpp"
 #include "XPSkillIcon.hpp"
+#include "XPPropsContent.hpp"
+#include "XPCreator.hpp"
 
 #include "resource.h"
 
@@ -10,11 +12,6 @@
 #include <wx/hyperlink.h>
 
 
-
-static inline void XPShowErrorBox(const wxString& message)
-{
-	wxMessageBox(message, L"Error", wxOK | wxICON_ERROR | wxCENTRE);
-}
 
 static const wxSize _default_wnd_size(1100, 640);
 static const wxString _load_icon_button_tooltip(
@@ -71,22 +68,20 @@ void XPMainWindow::OnSkillChanged(wxKeyEvent& event)
 void XPMainWindow::OnLoadIcon(wxCommandEvent& event)
 {
 	// Clear previous icon information
-	if (!bXPIsLoadIconMode)
+	if (!XPIconFilePath.empty())
 	{
 		XPIconBtn->SetLabelText(L"Select Icon");
 		XPIconBtn->SetToolTip(_load_icon_button_tooltip);
 		XPIconText->SetLabelText(wxEmptyString);
 		XPIconText->UnsetToolTip();
-		XPIconFileName.Clear();
 		XPIconFilePath.Clear();
 		XPIconPreview->Show(false);
-		bXPIsLoadIconMode = true;
 		return;
 	}
 
 	wxFileDialog openFileDialog(this,
 		L"Open Icon",
-		wxEmptyString, wxEmptyString,
+		XPGetBinaryDir(), wxEmptyString,
 		L"DDS files (*.dds)|*dds", wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_NO_FOLLOW);
 
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
@@ -124,23 +119,83 @@ void XPMainWindow::OnLoadIcon(wxCommandEvent& event)
 			XPIconPreview->Show(true);
 	}
 
-	XPIconFileName = fName;
 	XPIconFilePath = fPath;
-	XPIconText->SetLabelText(XPIconFileName + XPSprintf(L"\n(%ux%u)", iconWidth, iconHeight));
+	XPIconText->SetLabelText(fName + XPSprintf(L"\n(%ux%u)", iconWidth, iconHeight));
 	XPIconText->SetToolTip(XPIconFilePath);
 	XPIconBtn->SetLabelText(L"Unselect Icon");
 	XPIconBtn->UnsetToolTip();
-	bXPIsLoadIconMode = false;
 }
 
 void XPMainWindow::OnSelectSkillProp(wxCommandEvent& event)
 {
-	if (XPSkillList->GetSelection() == wxNOT_FOUND) return;
+	if (XPSkillList->GetCurrentSelection() == wxNOT_FOUND) return;
+
+	const auto prop = XPProps::Get()->Find(XPSkillList->GetStringSelection());
+
+#ifdef _DEBUG
+	if (!prop)
+	{
+		XPShowErrorBox(XPSprintf(L"Invalid selection: \"%s\"", XPSkillList->GetStringSelection().wc_str()));
+		XPSkillList->SetSelection(wxNOT_FOUND);
+		XPSkillList->GetXPDescriptionControl()->Clear();
+		return;
+	}
+#endif // _DEBUG
+
+	XPSkillList->GetXPDescriptionControl()->SetValue(prop->GetDescription());
 }
 
-void XPMainWindow::OnChangeSkillProp(const wxString& item)
+void XPMainWindow::OnAddSkillProp(const wxString& item)
+{
+	const auto prop = XPProps::Get()->Find(item);
+	wxDialog* const dialog = prop->GetCustomizeDialog();
+	if (dialog != nullptr)
+	{
+		dialog->ShowModal();
+		dialog->Destroy();
+	}
+	this->ReadyCheck();
+}
+
+void XPMainWindow::OnRemoveSkillProp(const wxString& item)
 {
 	this->ReadyCheck();
+}
+
+void XPMainWindow::OnCreateSkill(wxCommandEvent& event)
+{
+	wxDirDialog openDirDialog(this, L"Specify the folder", XPGetBinaryDir());
+
+	if (openDirDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	XPSkillInfo info;
+	info.create_path = openDirDialog.GetPath();
+	info.icon_path = XPIconFilePath;
+	info.id = XPID->GetValue();
+	info.name = XPName->GetValue();
+	info.descr = XPDesc->GetValue();
+	info.max_level = XPMaxLevel->GetValue();
+	info.req_level = XPReqLevel->GetValue();
+	info.each_level = XPEachLevel->GetValue();
+	info.req_prestige = XPReqPrestige->GetValue();
+
+	wxListBox* const list = XPSkillList->GetXPSelectedList();
+	info.props.reserve(list->GetCount());
+
+	wxArrayInt arr;
+	list->GetSelections(arr);
+	XPProps* const propsHandle = XPProps::Get();
+	for (const auto& n : arr)
+	{
+		info.props.push_back(propsHandle->Find(list->GetString(n)));
+	}
+
+	if (!XPCreate(info))
+		XPShowErrorBox(XPSprintf(L"Failed to create \"%s\"", info.name.wc_str()));
+	else
+		wxMessageBox(XPSprintf(L"\"%s\" created in: %s\\%s", info.name.wc_str(), info.create_path.wc_str(), info.id.wc_str()),
+			L"Success", wxOK | wxICON_INFORMATION | wxCENTRE);
 }
 
 void XPMainWindow::ReadyCheck()
@@ -158,8 +213,7 @@ XPMainWindow* XPMainWindow::Get()
 
 XPMainWindow::XPMainWindow()
 	: wxFrame(nullptr, wxID_ANY, L"XPCreator", wxDefaultPosition, _default_wnd_size,
-		wxSYSTEM_MENU | wxMINIMIZE_BOX | wxCLOSE_BOX | wxCAPTION | wxCLIP_CHILDREN),
-	bXPIsLoadIconMode(true)
+		wxSYSTEM_MENU | wxMINIMIZE_BOX | wxCLOSE_BOX | wxCAPTION | wxCLIP_CHILDREN)
 {
 	wxIcon icon;
 	icon.CreateFromHICON(LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_ICON1)));
@@ -167,8 +221,6 @@ XPMainWindow::XPMainWindow()
 
 	this->SetMinClientSize(_default_wnd_size);
 	
-	XPhbox = new wxBoxSizer(wxHORIZONTAL);
-
 	wxPanel* panelSkillInfo = new wxPanel(this, wxID_ANY);
 
 	wxButton* aboutButton = new wxButton(panelSkillInfo, XP_ID_ABOUT_BTN,
@@ -181,7 +233,7 @@ XPMainWindow::XPMainWindow()
 	moddbLink->SetFont(moddbLink->GetFont().Scale(1.2F));
 
 	wxHyperlinkCtrl* githubLink = new wxHyperlinkCtrl(panelSkillInfo, wxID_ANY,
-		L"GitHub", L"https://github.com/",
+		L"GitHub", L"https://github.com/Orleonn/XPCreator",
 		{ _default_wnd_size.x - 95, 65 }, { 70, 20 }, wxHL_ALIGN_CENTRE);
 	githubLink->SetFont(moddbLink->GetFont());
 
@@ -196,7 +248,7 @@ XPMainWindow::XPMainWindow()
 	XPName->SetToolTip(L"In-game skill display name.");
 
 	XPMaxLevel = new XPTrackBar(panelSkillInfo, wxID_ANY,
-		L"Max. Skill Level", 1, 1, 100, {15, 140}, { 200, 20 });
+		L"Max. Skill Level", 1, 1, 50, {15, 140}, { 200, 20 });
 	XPMaxLevel->SetToolTip(L"This setting specifies the maximum number of skill levels.");
 
 	XPReqLevel = new XPTrackBar(panelSkillInfo, wxID_ANY,
@@ -233,24 +285,22 @@ XPMainWindow::XPMainWindow()
 
 	XPSkillList = new XPSkillPropsBar(panelSkillInfo, XP_ID_SKILL_LIST,
 		{ 380, 435 });
-
-	XPSkillList->Append(L"asdasdasd");
-
+	XPProps::Get()->ForEach([this](XPBaseSkillProperty* const& prop) -> bool
+		{
+			XPSkillList->AppendString(prop->GetName());
+			return false;
+		});
 	XPSkillList->Bind(wxEVT_CHOICE, &XPMainWindow::OnSelectSkillProp, this, XP_ID_SKILL_LIST);
-	XPSkillList->SetXPAddItemCallback(&XPMainWindow::OnChangeSkillProp, this);
-	XPSkillList->SetXPRemoveItemCallback(&XPMainWindow::OnChangeSkillProp, this);
+	XPSkillList->SetXPAddItemCallback(&XPMainWindow::OnAddSkillProp, this);
+	XPSkillList->SetXPRemoveItemCallback(&XPMainWindow::OnRemoveSkillProp, this);
 
 	XPCreateBtn = new wxButton(panelSkillInfo, XP_ID_CREATE_SKILL_BTN,
 		L"Create Skill", { 115, 520 }, { 100, 75 });
 	XPCreateBtn->Enable(false);
+	XPCreateBtn->Bind(wxEVT_BUTTON, &XPMainWindow::OnCreateSkill, this, XP_ID_CREATE_SKILL_BTN);
 
-	//wxButton* aboutButton = new wxButton(panel, XP_ID_ABOUT_BTN, "About");
-	//wxButton* createSkillButton = new wxButton(panel2, XP_ID_CREATE_SKILL_BTN, "Create", {820, 23});
-
-	XPhbox->Add(panelSkillInfo, 1, wxEXPAND);
-	this->SetSizer(XPhbox);
-
-	//this->Bind(wxEVT_BUTTON, &_about_xp_creator, XP_ID_ABOUT_BTN);
-
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	hbox->Add(panelSkillInfo, 1, wxEXPAND);
+	this->SetSizer(hbox);
 	this->Centre();
 }

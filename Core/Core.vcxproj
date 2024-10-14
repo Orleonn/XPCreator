@@ -100,9 +100,11 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Props\JumpPower.cpp" />
+    <ClCompile Include="SkillProps\JumpPower.cpp" />
+    <ClCompile Include="SkillProps\MoveSpeedPower.cpp" />
     <ClCompile Include="XPApp.cpp" />
     <ClCompile Include="XPCreator.cpp" />
+    <ClCompile Include="XPDefs.cpp" />
     <ClCompile Include="XPSkillIcon.cpp" />
     <ClCompile Include="XPPropsContent.cpp" />
     <ClInclude Include="resource.h" />

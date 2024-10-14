@@ -17,8 +17,10 @@ public:
 	virtual wxString GetName() const = 0;
 	virtual wxString GetDescription() const = 0;
 	virtual wxDialog* GetCustomizeDialog() const = 0;
-	virtual wxString GetGameImplementation() const = 0;
-	virtual std::vector<wxString> GetInGameLevelDescriptions(int) const = 0;
+	virtual std::wstring GetInGameLevelDescription(int) const = 0;
+	virtual std::vector<std::pair<std::wstring, std::wstring>> GetRegisterCallbacks() const = 0;
+	virtual std::wstring GetUpdateFunctionName() const = 0;
+	virtual std::wstring GetScriptImplementation() const = 0;
 };
 
 class XPProps final
@@ -64,17 +66,19 @@ private:
 
 
 
-#define XP_DECLARE_SKILL_PROPERTY(ClassName, PropertyName)						\
-class ClassName final : public XPBaseSkillProperty								\
-{																				\
-public:																			\
-	ClassName() : XPBaseSkillProperty(PropertyName) {}							\
-	~ClassName() = default;														\
-																				\
-	wxString GetName() const override { return { PropertyName }; }				\
-	wxString GetDescription() const override;									\
-	wxDialog* GetCustomizeDialog() const override;								\
-	wxString GetGameImplementation() const override;							\
-	std::vector<wxString> GetInGameLevelDescriptions(int) const override;		\
-};																				\
+#define XP_DECLARE_SKILL_PROPERTY(ClassName, PropertyName)											\
+class ClassName final : public XPBaseSkillProperty													\
+{																									\
+public:																								\
+	ClassName() : XPBaseSkillProperty(PropertyName) {}												\
+	~ClassName() = default;																			\
+																									\
+	wxString GetName() const override { return { PropertyName }; }									\
+	wxString GetDescription() const override;														\
+	wxDialog* GetCustomizeDialog() const override;													\
+	std::wstring GetInGameLevelDescription(int) const override;										\
+	std::vector<std::pair<std::wstring, std::wstring>> GetRegisterCallbacks() const override;		\
+	std::wstring GetUpdateFunctionName() const override;											\
+	std::wstring GetScriptImplementation() const override;											\
+};																									\
 static ClassName __xp_static_property ## ClassName

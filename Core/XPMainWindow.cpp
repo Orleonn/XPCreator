@@ -39,7 +39,7 @@ static void _about_xp_creator(wxCommandEvent& event)
 void XPMainWindow::OnSkill_ID_Changed(wxKeyEvent& event)
 {
 	const wxChar ch = event.GetUnicodeKey();
-	if (ch < 127 && (wxIsalnum(ch) || ch == '_'))
+	if (ch < 127 && ((wxIsalnum(ch) && wxIslower(ch)) || ch == 95 || ch == 8))
 	{
 		this->ReadyCheck();
 		return;
@@ -180,21 +180,31 @@ void XPMainWindow::OnCreateSkill(wxCommandEvent& event)
 	info.each_level = XPEachLevel->GetValue();
 	info.req_prestige = XPReqPrestige->GetValue();
 
-	wxListBox* const list = XPSkillList->GetXPSelectedList();
-	info.props.reserve(list->GetCount());
-
-	wxArrayInt arr;
-	list->GetSelections(arr);
-	XPProps* const propsHandle = XPProps::Get();
-	for (const auto& n : arr)
+	std::size_t last_pos = 0;
+	while (true)
 	{
-		info.props.push_back(propsHandle->Find(list->GetString(n)));
+		last_pos = info.descr.find(L'\n', last_pos);
+		if (last_pos == std::wstring::npos)
+			break;
+		info.descr.insert(last_pos, L" \\n");
+		info.descr.insert((last_pos += 4), L"\t\t");
+		last_pos += 2;
+	}
+
+	wxListBox* const list = XPSkillList->GetXPSelectedList();
+	const unsigned int props_count = list->GetCount();
+	XPProps* const propsHandle = XPProps::Get();
+
+	info.props.reserve(props_count);
+	for (unsigned int i = 0; i < props_count; ++i)
+	{
+		info.props.push_back(propsHandle->Find(list->GetString(i)));
 	}
 
 	if (!XPCreate(info))
-		XPShowErrorBox(XPSprintf(L"Failed to create \"%s\"", info.name.wc_str()));
+		XPShowErrorBox(XPSprintf(L"Failed to create \"%s\"", info.name.c_str()));
 	else
-		wxMessageBox(XPSprintf(L"\"%s\" created in: %s\\%s", info.name.wc_str(), info.create_path.wc_str(), info.id.wc_str()),
+		wxMessageBox(XPSprintf(L"\"%s\" created in: %s\\%s", info.name.c_str(), info.create_path.c_str(), info.id.c_str()),
 			L"Success", wxOK | wxICON_INFORMATION | wxCENTRE);
 }
 
@@ -240,7 +250,7 @@ XPMainWindow::XPMainWindow()
 	XPID = new XPTextBar(panelSkillInfo, XP_ID_SKILL_ID,
 		L"Skill ID", wxEmptyString, { 15, 35 }, { 200, 20 });
 	XPID->Bind(wxEVT_AFTER_CHAR, &XPMainWindow::OnSkill_ID_Changed, this, XP_ID_SKILL_ID);
-	XPID->SetToolTip(L"Allowed characters: Aa-Zz, 0-9 or _");
+	XPID->SetToolTip(L"Allowed characters: a-z, 0-9 or _");
 
 	XPName = new XPTextBar(panelSkillInfo, XP_ID_SKILL_CHANGE,
 		L"Skill Name", wxEmptyString, { 15, 90 }, { 200, 20 });
@@ -265,7 +275,7 @@ XPMainWindow::XPMainWindow()
 
 	XPDesc = new XPTextBar(panelSkillInfo, XP_ID_SKILL_CHANGE,
 		L"Skill Description", wxEmptyString, { 15, 350 }, { 300, 150 },
-		wxTE_RICH | wxTE_MULTILINE | wxTE_PROCESS_TAB);
+		wxTE_RICH | wxTE_MULTILINE);
 	XPDesc->Bind(wxEVT_AFTER_CHAR, &XPMainWindow::OnSkillChanged, this, XP_ID_SKILL_CHANGE);
 
 	XPIconBtn = new wxButton(panelSkillInfo, XP_ID_LOAD_ICON_BTN,
@@ -303,4 +313,9 @@ XPMainWindow::XPMainWindow()
 	hbox->Add(panelSkillInfo, 1, wxEXPAND);
 	this->SetSizer(hbox);
 	this->Centre();
+}
+
+wxString XPMainWindow::GetSkillID() const
+{
+	return XPID->GetValue();
 }

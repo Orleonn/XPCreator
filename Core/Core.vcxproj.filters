@@ -22,8 +22,10 @@
     <ClCompile Include="XPApp.cpp" />
     <ClCompile Include="XPSkillIcon.cpp" />
     <ClCompile Include="XPPropsContent.cpp" />
-    <ClCompile Include="Props\JumpPower.cpp" />
+    <ClCompile Include="SkillProps\JumpPower.cpp" />
     <ClCompile Include="XPCreator.cpp" />
+    <ClCompile Include="XPDefs.cpp" />
+    <ClCompile Include="SkillProps\MoveSpeedPower.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Core.rc">

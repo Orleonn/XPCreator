@@ -12,6 +12,8 @@ class XPMainWindow final : public wxFrame
 public:
     static XPMainWindow* Get();
 
+    wxString GetSkillID() const;
+
 private:
     XPMainWindow();
 

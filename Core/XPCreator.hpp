@@ -11,7 +11,7 @@ class XPBaseSkillProperty;
 
 struct XPSkillInfo
 {
-	wxString create_path, icon_path, id, name, descr;
+	std::wstring create_path, icon_path, id, name, descr;
 	int max_level, req_level, each_level, req_prestige;
 	std::vector<XPBaseSkillProperty*> props;
 };

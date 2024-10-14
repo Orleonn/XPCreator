@@ -2,6 +2,8 @@
 #include "XPMainWindow.hpp"
 #include "XPTrackBar.hpp"
 
+
+
 #define DEFAULT_JUMP_POWER 5
 
 static int _jump_power = DEFAULT_JUMP_POWER;
@@ -43,18 +45,30 @@ wxDialog* JumpPowerProp::GetCustomizeDialog() const
 	return new JumpPowerCustomizeDialog(XPMainWindow::Get());
 }
 
-wxString JumpPowerProp::GetGameImplementation() const
+std::wstring JumpPowerProp::GetInGameLevelDescription(int desired_level) const
+{
+	return XPSprintf(L"%%c[d_blue] • %%c[d_cyan] increases your jumping power by %d%%", (_jump_power * desired_level));
+}
+
+std::vector<std::pair<std::wstring, std::wstring>>
+JumpPowerProp::GetRegisterCallbacks() const
 {
 	return {};
 }
 
-std::vector<wxString> JumpPowerProp::GetInGameLevelDescriptions(int total_levels) const
+std::wstring JumpPowerProp::GetUpdateFunctionName() const
 {
-	std::vector<wxString> vec;
-	vec.reserve(total_levels);
-	for (int i = 0; i < total_levels; ++i)
+	return { L"on_jump_power_prop_update" };
+}
+
+std::wstring JumpPowerProp::GetScriptImplementation() const
+{
+	const wxString id = XPMainWindow::Get()->GetSkillID();
+	const std::wstring content = XPReadFromFile(XPGetPropsDir() + L"\\JumpPower.txt");
+	if (content.empty())
 	{
-		//
+		XPShowErrorBox(L"Can't read JumpPower.txt!");
+		std::exit(1);
 	}
-	return vec;
+	return XPSprintf(content.c_str(), (static_cast<float>(_jump_power) / 100.0F), id.wc_str(), id.wc_str());
 }

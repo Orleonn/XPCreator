@@ -1,8 +1,7 @@
-local jump_power_mult_per_level = %.2f
 local function on_jump_power_prop_update(curr_level)
 	if curr_level == 0 then
 		jump.remove_jump("exp_skill_%s")
 		return
 	end
-	jump.add_jump("exp_skill_%s", 1 + jump_power_mult_per_level * curr_level, true)
+	jump.add_jump("exp_skill_%s", 1 + %.2f * curr_level, true)
 end

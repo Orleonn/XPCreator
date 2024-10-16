@@ -51,6 +51,8 @@ public:
         return wxSlider::ProcessEvent(event);
     }
 
+    wxStaticText* GetXPSliderCounter() const { return m_MSliderCounter; }
+
 private:
     wxStaticText* m_MSliderCounter, *m_MSliderName;
 

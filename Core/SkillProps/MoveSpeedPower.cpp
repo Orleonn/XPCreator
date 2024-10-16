@@ -10,19 +10,22 @@ static int _speed_power = XP_DEFAULT_MOVESPEED_POWER;
 
 static void _on_change_power(wxCommandEvent& event)
 {
-	_speed_power = static_cast<XPTrackBar*>(event.GetEventObject())->GetValue();
+	XPTrackBar* const ctrl = static_cast<XPTrackBar*>(event.GetEventObject());
+	_speed_power = ctrl->GetValue();
+	ctrl->GetXPSliderCounter()->SetLabelText(XPSprintf(L"%d%%", _speed_power));
 }
 
 class MoveSpeedPowerCustomizeDialog final : public wxDialog
 {
 public:
 	MoveSpeedPowerCustomizeDialog(wxWindow* parent)
-		: wxDialog(parent, wxID_ANY, L"Change speed power", wxDefaultPosition, { 170, 110 })
+		: wxDialog(parent, wxID_ANY, L"Change speed power", wxDefaultPosition, { 200, 110 })
 	{
 		_speed_power = XP_DEFAULT_MOVESPEED_POWER;
 		XPTrackBar* trackBar = new XPTrackBar(this, wxID_ANY,
-			L"Value (%)", XP_DEFAULT_MOVESPEED_POWER, 1, 25, { 15, 30 });
+			L"Value per skill level", XP_DEFAULT_MOVESPEED_POWER, 1, 25, { 15, 30 }, { 130, 30 });
 		trackBar->Bind(wxEVT_SLIDER, &_on_change_power);
+		trackBar->GetXPSliderCounter()->SetLabelText(XPSprintf(L"%d%%", _speed_power));
 
 		const wxPoint parentPos = parent->GetPosition();
 		const wxSize parentSize = parent->GetSize();
@@ -70,5 +73,5 @@ std::wstring MoveSpeedPowerProp::GetScriptImplementation() const
 		XPShowErrorBox(L"Can't read MoveSpeedPower.txt!");
 		std::exit(1);
 	}
-	return XPSprintf(content.c_str(), (static_cast<float>(_speed_power) / 100.0F), id.wc_str(), id.wc_str());
+	return XPSprintf(content.c_str(), id.wc_str(), id.wc_str(), (static_cast<float>(_speed_power) / 100.0F));
 }

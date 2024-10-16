@@ -10,19 +10,22 @@ static int _jump_power = DEFAULT_JUMP_POWER;
 
 static void _on_change_power(wxCommandEvent& event)
 {
-	_jump_power = static_cast<XPTrackBar*>(event.GetEventObject())->GetValue();
+	XPTrackBar* const ctrl = static_cast<XPTrackBar*>(event.GetEventObject());
+	_jump_power = ctrl->GetValue();
+	ctrl->GetXPSliderCounter()->SetLabelText(XPSprintf(L"%d%%", _jump_power));
 }
 
 class JumpPowerCustomizeDialog final : public wxDialog
 {
 public:
 	JumpPowerCustomizeDialog(wxWindow* parent)
-		: wxDialog(parent, wxID_ANY, L"Change jump power", wxDefaultPosition, { 170, 110 })
+		: wxDialog(parent, wxID_ANY, L"Change jump power", wxDefaultPosition, { 200, 110 })
 	{
 		_jump_power = DEFAULT_JUMP_POWER;
 		XPTrackBar* trackBar = new XPTrackBar(this, wxID_ANY,
-			L"Value (%)", DEFAULT_JUMP_POWER, 1, 25, { 15, 30 });
+			L"Value per skill level", DEFAULT_JUMP_POWER, 1, 25, { 15, 30 }, { 130, 30 });
 		trackBar->Bind(wxEVT_SLIDER, &_on_change_power);
+		trackBar->GetXPSliderCounter()->SetLabelText(XPSprintf(L"%d%%", _jump_power));
 
 		const wxPoint parentPos = parent->GetPosition();
 		const wxSize parentSize = parent->GetSize();
@@ -70,5 +73,5 @@ std::wstring JumpPowerProp::GetScriptImplementation() const
 		XPShowErrorBox(L"Can't read JumpPower.txt!");
 		std::exit(1);
 	}
-	return XPSprintf(content.c_str(), (static_cast<float>(_jump_power) / 100.0F), id.wc_str(), id.wc_str());
+	return XPSprintf(content.c_str(), id.wc_str(), id.wc_str(), (static_cast<float>(_jump_power) / 100.0F));
 }

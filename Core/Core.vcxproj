@@ -100,6 +100,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SkillProps\HealthRegen.cpp" />
     <ClCompile Include="SkillProps\JumpPower.cpp" />
     <ClCompile Include="SkillProps\MoveSpeedPower.cpp" />
     <ClCompile Include="XPApp.cpp" />

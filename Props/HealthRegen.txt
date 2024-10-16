@@ -1,0 +1,21 @@
+local health_regen_prop_last_update = 0
+local health_regen_prop_temp_health_regen = 0
+local function on_health_regen_prop_actor_on_update()
+    local tg = time_global()
+    if tg < health_regen_prop_last_update then
+        return
+    end
+
+    health_regen_prop_last_update = tg + 1000
+    local health_limit = advanced_stamina_system_ass and advanced_stamina_system_ass.blood_loss_limit or 1
+    db.actor.health = clamp(db.actor.health + health_regen_prop_temp_health_regen, 0, health_limit)
+end
+
+local function on_health_regen_prop_update(curr_level)
+	if curr_level == 0 then
+		UnregisterScriptCallback("actor_on_update", on_health_regen_prop_actor_on_update)
+		return
+	end
+    health_regen_prop_temp_health_regen = %.4f * curr_level
+	RegisterScriptCallback("actor_on_update", on_health_regen_prop_actor_on_update)
+end

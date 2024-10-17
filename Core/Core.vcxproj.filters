@@ -31,6 +31,8 @@
     <ClCompile Include="SkillProps\PsyHealthRegen.cpp" />
     <ClCompile Include="SkillProps\TasksRewards.cpp" />
     <ClCompile Include="SkillProps\TearEnemy.cpp" />
+    <ClCompile Include="SkillProps\CarryWeight.cpp" />
+    <ClCompile Include="SkillProps\TradeCost.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Core.rc">

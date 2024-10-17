@@ -50,7 +50,7 @@ wxDialog* HealthRegenProp::GetCustomizeDialog() const
 std::wstring HealthRegenProp::GetInGameLevelDescription(int desired_level) const
 {
 	return XPSprintf(L"%%c[d_blue] • %%c[d_cyan] increases your health regeneration by %.2f%%/sec",
-		(static_cast<float>(_health_regen) / 100.0F * desired_level));
+		(static_cast<float>(_health_regen) / 100.0F * static_cast<float>(desired_level)));
 }
 
 std::vector<std::pair<std::wstring, std::wstring>>

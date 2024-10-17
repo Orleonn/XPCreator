@@ -1,0 +1,19 @@
+local trade_cost_prop_bonus = 0
+local function trade_cost_prop_on_get_item_cost(kind, obj, profile, calculated_cost, ret)
+	if profile.mode ~= 2 then
+		return
+	end
+	
+	local base_cost = ret.new_cost or calculated_cost
+	local bonus_cost = calculated_cost * trade_cost_prop_bonus
+	ret.new_cost = clamp(base_cost - bonus_cost, 1, base_cost)
+end
+
+local function on_trade_cost_prop_update(curr_level)
+	if curr_level == 0 then
+		UnregisterScriptCallback("on_get_item_cost", trade_cost_prop_on_get_item_cost)
+		return
+	end
+    trade_cost_prop_bonus = %.3f * curr_level
+	RegisterScriptCallback("on_get_item_cost", trade_cost_prop_on_get_item_cost)
+end

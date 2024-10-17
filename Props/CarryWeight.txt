@@ -1,0 +1,7 @@
+local function on_carry_weight_prop_update(curr_level)
+	if curr_level == 0 then
+		weight.remove_weight("exp_skill_%s")
+		return
+	end
+	weight.add_weight("exp_skill_%s", %d * curr_level, true)
+end

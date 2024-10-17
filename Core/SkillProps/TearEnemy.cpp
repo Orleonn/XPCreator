@@ -49,7 +49,7 @@ wxDialog* TearEnemyProp::GetCustomizeDialog() const
 
 std::wstring TearEnemyProp::GetInGameLevelDescription(int desired_level) const
 {
-	const float val = (static_cast<float>(_tear_enemy) / 100.0F * desired_level);
+	const float val = (static_cast<float>(_tear_enemy) / 100.0F * static_cast<float>(desired_level));
 	return XPSprintf(L"%%c[d_blue] • %%c[d_cyan] chance to tear enemy %.2f%%",
 		(val > 100.0F ? 100.0F : val));
 }

@@ -100,8 +100,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SkillProps\CarryWeight.cpp" />
     <ClCompile Include="SkillProps\HealthRegen.cpp" />
     <ClCompile Include="SkillProps\JumpPower.cpp" />
+    <ClCompile Include="SkillProps\TradeCost.cpp" />
     <ClCompile Include="SkillProps\MoveSpeedPower.cpp" />
     <ClCompile Include="SkillProps\PsyHealthRegen.cpp" />
     <ClCompile Include="SkillProps\TearEnemy.cpp" />

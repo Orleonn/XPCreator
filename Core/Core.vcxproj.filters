@@ -29,6 +29,8 @@
     <ClCompile Include="SkillProps\HealthRegen.cpp" />
     <ClCompile Include="SkillProps\StaminaRegen.cpp" />
     <ClCompile Include="SkillProps\PsyHealthRegen.cpp" />
+    <ClCompile Include="SkillProps\TasksRewards.cpp" />
+    <ClCompile Include="SkillProps\TearEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Core.rc">

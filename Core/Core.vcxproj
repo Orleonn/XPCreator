@@ -104,7 +104,9 @@
     <ClCompile Include="SkillProps\JumpPower.cpp" />
     <ClCompile Include="SkillProps\MoveSpeedPower.cpp" />
     <ClCompile Include="SkillProps\PsyHealthRegen.cpp" />
+    <ClCompile Include="SkillProps\TearEnemy.cpp" />
     <ClCompile Include="SkillProps\StaminaRegen.cpp" />
+    <ClCompile Include="SkillProps\TasksRewards.cpp" />
     <ClCompile Include="XPApp.cpp" />
     <ClCompile Include="XPCreator.cpp" />
     <ClCompile Include="XPDefs.cpp" />

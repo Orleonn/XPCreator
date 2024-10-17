@@ -1,0 +1,18 @@
+local tasks_rewards_prop_enabled = false
+local tasks_rewards_prop_bonus = 0
+local tasks_rewards_prop_get_eco_factor_orig = game_difficulties.get_eco_factor
+game_difficulties.get_eco_factor = function(key)
+	if key == "rewards" and tasks_rewards_prop_enabled then
+		return tasks_rewards_prop_get_eco_factor_orig(key) + tasks_rewards_prop_bonus
+	end
+	return tasks_rewards_prop_get_eco_factor_orig(key)
+end
+
+local function on_tasks_rewards_prop_update(curr_level)
+	if curr_level == 0 then
+		tasks_rewards_prop_enabled = false
+		return
+	end
+    tasks_rewards_prop_bonus = %.2f * curr_level
+	tasks_rewards_prop_enabled = true
+end

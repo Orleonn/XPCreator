@@ -1,0 +1,49 @@
+local tear_enemy_prop_explosion_effects_queue = {}
+local function tear_enemy_prop_play_explosion_effect(position)
+	if (not position) then
+		return
+	end
+	
+	local q_num = #tear_enemy_prop_explosion_effects_queue + 1
+	tear_enemy_prop_explosion_effects_queue[q_num] = {}
+	local t = tear_enemy_prop_explosion_effects_queue[q_num]
+	
+	t.tear_eff = particles_object("anomaly2\\body_tear_0" .. math.random(1,2))
+	t.tear_snd = sound_object("anomaly\\anomaly_body_tear_1")
+	if t.tear_eff and t.tear_snd then
+		t.tear_eff:play_at_pos(position)
+		t.tear_snd:play_at_pos(db.actor, position)
+		t.tear_snd.volume = 1
+	end
+
+	t.explo_eff = particles_object("explosions\\explosion_01")
+	t.explo_snd = sound_object("weapons\\explo\\frage_grenade_explotion\\frage_grenade_01")
+	if t.explo_eff and t.explo_snd then
+		t.explo_eff:play_at_pos(position)
+		t.explo_snd:play_at_pos(db.actor, position)
+		t.explo_snd.volume = 1
+	end
+	
+	CreateTimeEvent(0, "exp_skill_%s_clear_explosion_effect"..q_num, 10, function(num)
+		tear_enemy_prop_explosion_effects_queue[num] = nil
+		return true
+	end, q_num)
+end
+
+local tear_enemy_prop_chance = 0
+local function tear_enemy_prop_actor_on_weapon_fired(actor, weapon, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+	local obj = level.get_target_obj()
+	if obj and obj:alive() and (IsStalker(obj) or IsMonster(obj)) and math.random() <= tear_enemy_prop_chance then
+		tear_enemy_prop_play_explosion_effect(utils_obj.safe_bone_pos(obj, "bip01_neck"))
+		obj:kill(actor)
+	end
+end
+
+local function on_tear_enemy_prop_update(curr_level)
+	if curr_level == 0 then
+		UnregisterScriptCallback("actor_on_weapon_fired", tear_enemy_prop_actor_on_weapon_fired)
+		return
+	end
+	tear_enemy_prop_chance = %.4f * curr_level
+	RegisterScriptCallback("actor_on_weapon_fired", tear_enemy_prop_actor_on_weapon_fired)
+end

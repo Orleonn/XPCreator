@@ -1,0 +1,20 @@
+local psy_health_regen_prop_last_update = 0
+local psy_health_regen_prop_temp_health_regen = 0
+local function on_psy_health_regen_prop_actor_on_update()
+    local tg = time_global()
+    if tg < psy_health_regen_prop_last_update then
+        return
+    end
+
+    psy_health_regen_prop_last_update = tg + 1000
+	arszi_psy.set_psy_health(clamp(arszi_psy.get_psy_health() + psy_health_regen_prop_temp_health_regen, 0, 1))
+end
+
+local function on_psy_health_regen_prop_update(curr_level)
+	if curr_level == 0 then
+		UnregisterScriptCallback("actor_on_update", on_psy_health_regen_prop_actor_on_update)
+		return
+	end
+    psy_health_regen_prop_temp_health_regen = %.4f * curr_level
+	RegisterScriptCallback("actor_on_update", on_psy_health_regen_prop_actor_on_update)
+end

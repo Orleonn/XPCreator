@@ -39,7 +39,7 @@ XP_DECLARE_SKILL_PROPERTY(HealthRegenProp, L"Additional health regeneration");
 
 wxString HealthRegenProp::GetDescription() const
 {
-	return { L"Increase default health regeneration at 0.01%/sec by default per each skill level" };
+	return { L"Increase health regeneration at 0.01%/sec by default per each skill level" };
 }
 
 wxDialog* HealthRegenProp::GetCustomizeDialog() const

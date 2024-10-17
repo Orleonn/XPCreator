@@ -27,6 +27,8 @@
     <ClCompile Include="XPDefs.cpp" />
     <ClCompile Include="SkillProps\MoveSpeedPower.cpp" />
     <ClCompile Include="SkillProps\HealthRegen.cpp" />
+    <ClCompile Include="SkillProps\StaminaRegen.cpp" />
+    <ClCompile Include="SkillProps\PsyHealthRegen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Core.rc">

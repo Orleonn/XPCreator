@@ -1,0 +1,21 @@
+local stamina_regen_prop_last_update = 0
+local stamina_regen_prop_temp_health_regen = 0
+local function on_stamina_regen_prop_actor_on_update()
+    local tg = time_global()
+    if tg < stamina_regen_prop_last_update then
+        return
+    end
+
+    stamina_regen_prop_last_update = tg + 1000
+    local power_limit = advanced_stamina_system_ass and advanced_stamina_system_ass.satiety_power_limit or 1
+    db.actor.power = clamp(db.actor.power + stamina_regen_prop_temp_health_regen, 0, power_limit)
+end
+
+local function on_stamina_regen_prop_update(curr_level)
+	if curr_level == 0 then
+		UnregisterScriptCallback("actor_on_update", on_stamina_regen_prop_actor_on_update)
+		return
+	end
+    stamina_regen_prop_temp_health_regen = %.4f * curr_level
+	RegisterScriptCallback("actor_on_update", on_stamina_regen_prop_actor_on_update)
+end
